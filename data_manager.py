@@ -14,11 +14,13 @@ class DataManager:
         stock_df = stock_df.sort_index(ascending=True)
         return stock_df
 
-    def daily_variation_addition(self, stock_df, stock):
+    def addition_new_data(self, stock_df, stock):
         #Calculation of all pct_daily_change
         stock_df[f'{stock}_pct_daily_change'] = stock_df['4. close'].pct_change() * 100
         #Round to 2 decimals and eliminate NaN
         stock_df[f'{stock}_pct_daily_change'] = round(stock_df[f'{stock}_pct_daily_change'], 2)
+        #Create new column with tendency data
+        stock_df[f'{stock}_moving_average'] = stock_df['4. close'].rolling(window=20).mean()
         #Remove NaN
         stock_df = stock_df.dropna()
         return (stock_df)

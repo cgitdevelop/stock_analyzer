@@ -5,8 +5,10 @@ import matplotlib.pyplot as plt
 import time
 
 #User query for getting stock names
-user_query = (input("Which stocks do you want to analyze? (separated by commas): ")).upper()
-list_stocks = [stock.strip() for stock in user_query.split(",")]
+# user_query = (input("Which stocks do you want to analyze? (separated by commas): ")).upper()
+# list_stocks = [stock.strip() for stock in user_query.split(",")]
+
+list_stocks = ['IBM']
 
 processed_stocks = 0
 
@@ -24,12 +26,13 @@ for stock in list_stocks:
     #Create df
     stock_df = data_manager.dataframe_creation(api_data,stock)
     #Add variation column
-    df_new_column = data_manager.daily_variation_addition(stock_df,stock)
+    df_new_column = data_manager.addition_new_data(stock_df,stock)
     #Paint the stock line in plot
     plt.figure(1)
-    data_plotter.add_line(df_new_column,f'{stock}_pct_daily_change', stock)
+    data_plotter.add_line(df_new_column,f'{stock}_pct_daily_change', f'{stock} - Daily variation')
     plt.figure(2)
-    data_plotter.add_line(df_new_column,'4. close', stock)
+    data_plotter.add_line(df_new_column,'4. close', f'{stock} - Daily values')
+    data_plotter.add_line(df_new_column,f'{stock}_moving_average', f'{stock} - Moving Average')
     # Avoid the API block due to too much requests
     time.sleep(15)
     processed_stocks += 1
