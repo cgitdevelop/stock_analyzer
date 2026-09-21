@@ -4,7 +4,7 @@ from data_plotter import DataPlotter
 import matplotlib.pyplot as plt
 import time
 
-
+#User query for getting stock names
 user_query = (input("Which stocks do you want to analyze? (separated by commas): ")).upper()
 list_stocks = [stock.strip() for stock in user_query.split(",")]
 
