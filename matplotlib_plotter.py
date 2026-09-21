@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 
-class DataPlotter:
+class MatplotlibPlotter:
     def add_line(self, stock_df, column, stock):
         stock_df[column].plot(label=stock)
 
