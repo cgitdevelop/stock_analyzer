@@ -8,7 +8,7 @@ import os
 class ApiClient:
     def __init__(self, symbol):
         #Variable to avoid using API for testing
-        self.no_api = 1 # 1 to avoid API
+        self.no_api = 0 # 1 to avoid using API, any other to use API
         # Read .env
         load_dotenv()
         # Extract key

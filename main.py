@@ -1,30 +1,32 @@
 from api_client import ApiClient
 from data_manager import DataManager
-from matplotlib_plotter import MatplotlibPlotter
 from plotly_plotter import PlotlyPlotter
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import time
 
 
-
 #User query for getting stock names
-# user_query = (input("Which stocks do you want to analyze? (separated by commas): ")).upper()
-# list_stocks = [stock.strip() for stock in user_query.split(",")]
+user_query = (input("Which stocks do you want to analyze? (separated by commas): ")).upper()
+list_stocks = [stock.strip() for stock in user_query.split(",")]
 
-while True:
-    user_query_plot = (input("Do you want Static or Live plots? ")).strip().lower()
-    if user_query_plot == "live" or user_query_plot == "static":
-        break
-
-list_stocks = ['IBM']
-
-processed_stocks = 0
+fig = go.Figure()
 
 data_manager = DataManager()
-matplot_plot = MatplotlibPlotter()
-plotly_plot = PlotlyPlotter()
+plotly_plot = PlotlyPlotter(fig)
+
+#Flow to ask for individual plots
+show_individual = False
+if len(list_stocks) == 1:
+    show_individual = True
+else:
+    individual_stock = input(
+        "Besides the multi-stock comparison, do you want to see individual plots for these stocks? (Yes or No): ").lower().strip()
+    if individual_stock == 'yes':
+        show_individual = True
 
 for stock in list_stocks:
+
+### Download of data from API ###
     data_stock = ApiClient(stock)
     #Obtain stock data
     api_data = data_stock.data_request()
@@ -32,33 +34,26 @@ for stock in list_stocks:
     if api_data is None:
         print("Stopping process due to excess of API requests")
         break
+
+### Creation of the dataframe ###
     #Create df
     stock_df = data_manager.dataframe_creation(api_data,stock)
     #Add variation column
     df_new_column = data_manager.addition_new_data(stock_df,stock)
 
-    if user_query_plot == "static":
-        #Paint the stock line in plot
-        plt.figure(1)
-        matplot_plot.add_line(df_new_column, f'{stock}_pct_daily_change', f'{stock} - Daily variation')
-        plt.figure(2)
-        matplot_plot.add_line(df_new_column, '4. close', f'{stock} - Daily values')
-        matplot_plot.add_line(df_new_column, f'{stock}_moving_average', f'{stock} - Moving Average')
-        # Avoid the API block due to too much requests
-        time.sleep(15)
-        processed_stocks += 1
+### Plotting ###
+    if show_individual:
+        #Principal plot: Closing + MA
+        plotly_plot.create_line_plot(df_new_column, [f'{stock} close value', f'{stock} moving average'], f'1. {stock} - Tendency and daily values')
+        #Secondary plot: Daily change (Volatility)
+        plotly_plot.create_line_plot(df_new_column, f'{stock} pct daily change', f'2. {stock} - Daily variation (volatility)')
+    if len(list_stocks) > 1:
+        # Principal plot: Base 100 for all stocks
+        plotly_plot.create_multi_line_plot(df_new_column, f'{stock} base 100', stock)
+    time.sleep(15)
 
-        if processed_stocks > 0:
-            # Create plots
-            plt.figure(1)
-            matplot_plot.save_plot("Daily variation")
-            plt.figure(2)
-            matplot_plot.save_plot("Daily values")
-        else:
-            print ("No data to plot")
-
-    elif user_query_plot == "live":
-        plotly_plot.create_plot_plotly(df_new_column,["4. close",f'{stock}_moving_average'])
-        plotly_plot.create_plot_plotly(df_new_column, f'{stock}_pct_daily_change')
+if len(list_stocks) > 1:
+    fig.update_layout(title_text="Performance Comparison (Base 100)")
+    fig.show()
 
 
