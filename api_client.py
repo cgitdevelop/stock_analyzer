@@ -1,4 +1,9 @@
-import pandas as pd
+"""
+Used to connect to alphavantage's site through API to gather stock data
+- Variable self.no_api used to run the code with no API connection for development
+"""
+
+
 import requests
 from dotenv import load_dotenv
 import json

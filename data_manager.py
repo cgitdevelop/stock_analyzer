@@ -1,3 +1,10 @@
+"""
+Used to create a DataFrame from the data obtained with the API
+- It gathers data in a structured way
+- It adds new columns with the new calculations to generate the plots
+"""
+
+
 import pandas as pd
 
 class DataManager:
