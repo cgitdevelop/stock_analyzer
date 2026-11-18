@@ -37,8 +37,9 @@ class ApiClient:
         else:
             response = requests.get(url= "https://www.alphavantage.co/query?", params= parameters_stock)
             json_response = response.json()
-            if "Information" in json_response:
-                return None
+            if "Time Series (Daily)" in json_response:
+                return json_response["Time Series (Daily)"]
             else:
-                data_stock = json_response["Time Series (Daily)"]
-            return data_stock
+                #Show API response
+                print(f"Respuesta de API denegada o errónea para {self.symbol}: {json_response}")
+                return None
